@@ -1,3 +1,4 @@
+const express = require("express");
 const app = require('express')();
 const server = require('http').Server(app);
 const next = require('next');
@@ -18,7 +19,7 @@ nextApp.prepare().then(() => {
 
   server.listen(PORT, err => {
     if (err) throw err;
-    console.log(`Express server running on ${PORT}`);
+    console.log("Express server running");
   });
 });
 
