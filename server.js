@@ -23,4 +23,9 @@ nextApp.prepare().then(() => {
   });
 });
 
+// mongodb+srv://romeo:raffael@olmec.8c71i.mongodb.net/Medison?retryWrites=true&w=majority
+// jwtSecret=Adam
+
+// mongodb+srv://Leo:leo123456@triade.dxhqz.mongodb.net/chaat?retryWrites=true&w=majority
+
 // app.use('/api/auth', require('./api/auth'))

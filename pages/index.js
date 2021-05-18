@@ -13,15 +13,15 @@ function Index({posts}) {
 }
 
 Index.getInitialProps = async ctx => {
-  try {
     const res = await axios.get('https://jsonplaceholder.typicode.com/posts');
+
+    const {name } =ctx.query;
+    console.log(name);
 
     return { posts: res.data };
 
 
-  } catch (error) {
-    return { errorLoading: true };
-  }
+  
 };
 
 export default Index;
