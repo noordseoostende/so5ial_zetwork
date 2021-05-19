@@ -1,7 +1,7 @@
 import App from 'next/app';
 import axios from "axios";
-import { parseCookies, destroyCookie } from "cookies";
-// import { parseCookies, destroyCookie } from "nookies";
+// import { parseCookies, destroyCookie } from "cookies";
+import { parseCookies, destroyCookie } from "nookies";
 import baseUrl from "../utils/baseUrl";
 import { redirectUser } from "../utils/authUser";
 import Layout from '../components/Layout/Layout';
