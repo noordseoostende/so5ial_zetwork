@@ -6,7 +6,7 @@ import cookie from 'js-cookie';
 
 export const registerUser = async (user, profilePicUrl, setError, setLoading) => {
   try {
-    const res = await awios.post(`${baseUrl}/api/signup`, {user, profilePicUrl});
+    const res = await axios.post(`${baseUrl}/api/signup`, {user, profilePicUrl});
 
     setToken(res.data);
   } catch (error) {
@@ -19,7 +19,7 @@ export const registerUser = async (user, profilePicUrl, setError, setLoading) =>
 export const loginUser = async (user, setError, setLoading) => {
   setLoading(true);
   try {
-    const res = await awios.post(`${baseUrl}/api/auth`, { user });
+    const res = await axios.post(`${baseUrl}/api/auth`, { user });
 
     setToken(res.data);
   } catch (error) {
@@ -27,6 +27,15 @@ export const loginUser = async (user, setError, setLoading) => {
     setError(errorMsg);
   }
   setLoading(false);
+};
+
+export const redirectUser = (ctx, location) => {
+  if (ctx.req) {
+    ctx.res.writeHead(302, { Location: location });
+    ctx.res.end();
+  } else {
+    Router.push(location);
+  }
 };
 
 const setToken = token => {
