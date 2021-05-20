@@ -3,12 +3,12 @@ const router=express.Router();
 const authMiddleware=require('../middleware/authMiddleware');
 const UserModel=require('../models/UserModel');
 
-removeListener.get('/:searchText', async(req, res) => {
+router.get('/:searchText', authMiddleware, async(req, res) => {
+  try {
   const {searchText} = req.params;
 
   if(searchText.length === 0) return;
 
-  try {
     let userPattern = new RegExp(`^${searchText}`);
 
     const results = await UserModel.find({
@@ -20,4 +20,6 @@ removeListener.get('/:searchText', async(req, res) => {
     console.error(error);
     return res.status(500).send(`Server error`);
   }
-})
+});
+
+module.exports = router;

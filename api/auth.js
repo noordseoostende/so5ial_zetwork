@@ -7,8 +7,8 @@ const bcrypt = require("bcryptjs");
 const isEmail = require("validator/lib/isEmail");
 const authMiddleware = require('../middleware/authMiddleware');
 
-router.get('/', authMiddleware, async(req, res) => {
-  const {userId} = req
+router.get("/", authMiddleware, async(req, res) => {
+  const {userId} = req;
 
   try {
     const user = await UserModel.findById(userId);
@@ -19,15 +19,12 @@ router.get('/', authMiddleware, async(req, res) => {
     console.error(error);
     return res.status(500).send(`Server error`);
   }
-})
+});
 
 
 
 router.post("/", async (req, res) => {
-  const {
-    email,
-    password
-  } = req.body.user;
+  const { email, password } = req.body.user;
 
   if (!isEmail(email)) return res.status(401).send("Invalid Email");
 
@@ -36,7 +33,7 @@ router.post("/", async (req, res) => {
   }
 
   try {
-    user = await UserModel.findOne({ email: email.toLowerCase() }).select("+password");
+    const user = await UserModel.findOne({ email: email.toLowerCase() }).select("+password");
 
     if (!user) {
       return res.status(401).send("Ongeldige gebruikgegevens");
