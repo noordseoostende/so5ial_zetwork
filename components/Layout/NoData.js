@@ -2,19 +2,19 @@ import { Message, Button } from "semantic-ui-react";
 
 export const NoProfilePosts = () => (
   <>
-    <Message info icon="meh" header="Sorry" content="User has not posted anything yet!" />
-    <Button icon="long arrow alternate left" content="Go Back" as="a" href="/" />
+    <Message info icon="meh" header="Sorry" content="Gebruiker heeft nog niets gepost!" />
+    <Button icon="long arrow alternate left" content="Ga Terug" as="a" href="/" />
   </>
 );
 
 export const NoFollowData = ({ followersComponent, followingComponent }) => (
   <>
     {followersComponent && (
-      <Message icon="user outline" info content="User does not have followers" />
+      <Message icon="user outline" info content="Gebruiker heeft geen volgers" />
     )}
 
     {followingComponent && (
-      <Message icon="user outline" info content="User does not follow any users" />
+      <Message icon="user outline" info content="Gebruiker volgt geen gebruikers" />
     )}
   </>
 );
@@ -24,7 +24,7 @@ export const NoMessages = () => (
     info
     icon="telegram plane"
     header="Sorry"
-    content="You have not messaged anyone yet.Search above to message someone!"
+    content="Je hebt nog niemand een bericht gestuurd.Zoek hierboven naar bericht iemand!"
   />
 );
 
@@ -33,10 +33,10 @@ export const NoPosts = () => (
     info
     icon="meh"
     header="Hey!"
-    content="No Posts. Make sure you have followed someone."
+    content="Geen Posts. Zorg ervoor dat je iemand hebt gevolgd."
   />
 );
 
 export const NoProfile = () => (
-  <Message info icon="meh" header="Hey!" content="No Profile Found." />
+  <Message info icon="meh" header="Hallo!" content="Geen Profiel Gevonden." />
 );
