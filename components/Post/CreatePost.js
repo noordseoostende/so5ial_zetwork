@@ -53,7 +53,7 @@ function CreatePost({ user, setPosts }) {
       newPost.location,
       picUrl,
       setPosts,
-      setNewPosts,
+      setNewPost,
       setError
     );
     setMedia(null);

@@ -16,6 +16,8 @@ import calculateTime from "../../utils/calculateTime";
 import Link from "next/link";
 import { deletePost, likePost } from "../../utils/postActions";
 import LikesList from "./LikesList";
+import ImageModal from "./ImageModal";
+import NoImageModal from "./NoImageModal";
 
 function CardPost({post, user, setPosts, setShowToastr}) {
 
@@ -27,8 +29,33 @@ function CardPost({post, user, setPosts, setShowToastr}) {
 
   const [error, setError] = useState(null);
 
+  const [showModal, setShowModal] = useState(false);
+
+  const addPropsToModal = () => ({
+    post,
+    user,
+    setLikes,
+    likes,
+    isLiked,
+    comments,
+    setComments
+  });
+
   return (
     <>
+    {showModal && (
+      <Modal 
+        open={showModal}
+        closeIcon
+        closeOnDimmerClick
+        onClose={() => setShowModal(false)}
+        >
+          <Modal.Content>
+            {post.picUrl ? (<ImageModal {...addPropsToModal()} /> ) : (<NoImageModal {...addPropsToModal()} />)}
+          </Modal.Content>
+
+      </Modal>
+    )}
       <Segment basic>
         <Card color="teal" fluid>
           {post.picUrl && (
@@ -39,6 +66,7 @@ function CardPost({post, user, setPosts, setShowToastr}) {
               wrapped
               ui={false}
               alt="PostImage"
+              onClick={() => setShowModal(true)}
               />
             )}
             <Card.Content>
@@ -139,10 +167,10 @@ function CardPost({post, user, setPosts, setShowToastr}) {
                 color="teal"
                 basic
                 circular
-                
+                onClick={() => setShowModal(true)}
               />
             )}
-            {/* onClick={() => setShowModal(true)} */}
+            
                   <Divider hidden />
 
                   <CommentInputField
