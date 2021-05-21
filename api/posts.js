@@ -8,11 +8,11 @@ const uuid = require("uuid").v4;
 
 // CREATE A POST
 
-router.post('/', authMiddleware, async(req,res) => {
+router.post("/", authMiddleware, async (req, res) => {
+  const { text, location, picUrl } = req.body;
 
-  const {text, location, picUrl} = req.body;
-
-  if(text.length < 1)return res.status(401).send('Het tekst omvat minstens 1 letter')
+  if (text.length < 1)
+    return res.status(401).send("Text must be atleast 1 character");
 
   try {
     const newPost = {
@@ -24,7 +24,9 @@ router.post('/', authMiddleware, async(req,res) => {
 
     const post = await new PostModel(newPost).save();
 
-    return res.json(post._id);
+    const postCreated = await PostModel.findById(post._id).populate("user");
+
+    return res.json(postCreated);
   } catch (error) {
     console.error(error);
     return res.status(500).send(`Server error`);
@@ -33,12 +35,46 @@ router.post('/', authMiddleware, async(req,res) => {
 
 // GET ALL POSTS
 
-router.get('/', authMiddleware, async(req, res) => {
+// router.get('/', authMiddleware, async(req, res) => {
+//   try {
+//     const posts = await PostModel.find()
+//       .sort({ createdAt: -1})
+//       .populate("user")
+//       .populate("comments.user");
+
+//     return res.json(posts);
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).send(`Server error`);
+//   }
+// });
+
+router.get("/", authMiddleware, async (req, res) => {
+  const { pageNumber } = req.query;
+
+  const number = Number(pageNumber);
+  const size = 8;
+
   try {
-    const posts = await PostModel.find()
-      .sort({ createdAt: -1})
-      .populate("user")
-      .populate("comments.user");
+    let posts;
+
+    if (number === 1) {
+      posts = await PostModel.find()
+        .limit(size)
+        .sort({ createdAt: -1 })
+        .populate("user")
+        .populate("comments.user");
+    }
+    //
+    else {
+      const skips = size * (number - 1);
+      posts = await PostModel.find()
+        .skip(skips)
+        .limit(size)
+        .sort({ createdAt: -1 })
+        .populate("user")
+        .populate("comments.user");
+    }
 
     return res.json(posts);
   } catch (error) {

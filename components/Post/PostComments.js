@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Comment, Icon } from "semantic-ui-react";
 import calculateTime from "../../utils/calculateTime";
+import { deleteComment } from "../../utils/postActions";
 
-function PostComment({comment, user, setComments, postId}) {
+function PostComments({comment, user, setComments, postId}) {
 
   const [disabled, setDisabled] = useState(false);
   return (
@@ -25,7 +26,11 @@ function PostComment({comment, user, setComments, postId}) {
                     disabled={disabled}
                     color="red"
                     name="trash"
-                    
+                    onClick={async () => {
+                      setDisabled(true);
+                      await deleteComment(postId, comment._id, setComments);
+                      setDisabled(false);
+                    }}
                     
                   />
                   
@@ -39,9 +44,6 @@ function PostComment({comment, user, setComments, postId}) {
   );
 }
 
-// onClick={async () => {
-//   setDisabled(true);
-//   await deleteComment(postId, comment._id, setComments);
-//   setDisabled(false);
 
-export default PostComment;
+
+export default PostComments;

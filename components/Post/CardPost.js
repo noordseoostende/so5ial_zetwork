@@ -14,6 +14,8 @@ import PostComments from "./PostComments";
 import CommentInputField from "./CommentInputField";
 import calculateTime from "../../utils/calculateTime";
 import Link from "next/link";
+import { deletePost, likePost } from "../../utils/postActions";
+import LikesList from "./LikesList";
 
 function CardPost({post, user, setPosts, setShowToastr}) {
 
@@ -57,7 +59,12 @@ function CardPost({post, user, setPosts, setShowToastr}) {
                   }>
                     <Header as="h4" content="Ben je zeker?" />
                     <p>Deze actie is onomkeerbaar!</p>
-                    <Button color="red" icon="trash" content="Verwijder" />
+                    <Button 
+                      color="red" 
+                      icon="trash" 
+                      content="Verwijder"
+                      onClick={() => deletePost(post._id, setPosts, setShowToastr)}
+                      />
                   </Popup>
                 </>
               )}
@@ -86,13 +93,25 @@ function CardPost({post, user, setPosts, setShowToastr}) {
                 name={isLiked ? "heart" : "heart outline"}
                 color="red"
                 style={{ cursor: "pointer" }}
+                onClick={() => 
+                  likePost(post._id, user._id, setLikes, isLiked ? false : true)}
               />
 
-              {likes.length > 0 && (
+              {/* {likes.length > 0 && (
                 <span className="spanLikesList">
                   {`${likes.length} ${likes.length === 1 ? "like" : "likes"}`}
                 </span>
-              )}
+              )} */}
+              <LikesList
+              postId={post._id}
+              trigger={
+                likes.length > 0 && (
+                  <span className="spanLikesList">
+                    {`${likes.length} ${likes.length === 1 ? "like" : "likes"}`}
+                  </span>
+                )
+              }
+            />
 
               <Icon 
                 name="comment outline"
@@ -100,19 +119,30 @@ function CardPost({post, user, setPosts, setShowToastr}) {
                 color="blue"
                 />
 
-                {comments.length > 0 &&
-                  comments.map((comment, i) => i < 3 && (
-                    <PostComments 
+{comments.length > 0 &&
+              comments.map(
+                (comment, i) =>
+                  i < 3 && (
+                    <PostComments
                       key={comment._id}
                       comment={comment}
                       postId={post._id}
                       user={user}
                       setComments={setComments}
                     />
-                  ))}
-                  {comments.length > 3 && (
-                    <Button content="Toon Meer" color="teal" basic circular />
-                  )}
+                  )
+              )}
+
+            {comments.length > 3 && (
+              <Button
+                content="View More"
+                color="teal"
+                basic
+                circular
+                
+              />
+            )}
+            {/* onClick={() => setShowModal(true)} */}
                   <Divider hidden />
 
                   <CommentInputField
