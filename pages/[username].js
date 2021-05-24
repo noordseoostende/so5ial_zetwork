@@ -3,10 +3,18 @@ import { useRouter } from "next/router";
 import axios from "axios";
 import baseUrl from "../utils/baseUrl";
 import { parseCookies } from "nookies";
-import { Grid } from "semantic-ui-react";
-import ProfileMenuTabs from "../components/Profile/ProfileMenuTabs";
 import { NoProfile } from "../components/Layout/NoData";
 import cookie from "js-cookie";
+import { Grid } from "semantic-ui-react";
+import ProfileMenuTabs from "../components/Profile/ProfileMenuTabs";
+import ProfileHeader from "../components/Profile/ProfileHeader";
+import CardPost from "../components/Post/CardPost";
+import { PlaceHolderPosts } from "../components/Layout/PlaceHolderGroup";
+import { PostDeleteToastr } from "../components/Layout/Toastr";
+import Followers from "../components/Profile/Followers";
+import Following from "../components/Profile/Following";
+import UpdateProfile from "../components/Profile/UpdateProfile";
+import Settings from "../components/Profile/Settings";
 
 function ProfilePage({
     profile, 
@@ -20,19 +28,20 @@ function ProfilePage({
   const router = useRouter();
   const [posts,setPosts]=useState([]);
   const [loading,setLoading]=useState(false);
+  const [showToastr, setShowToastr] = useState(false);
 
   const [activeItem, setActiveItem] = useState("profile");
   const handleItemClick = item => setActiveItem(item);
 
   const [loggedUserFollowStats, setUserFollowStats] = useState(userFollowStats);
-
+  
   const ownAccount = profile.user._id === user._id;
 
   if (errorLoading) return <NoProfile />;
   
   useEffect(() => {
     const getPosts = async () => {
-      setLoading(true)
+      setLoading(true);
       try {
         const { username } = router.query;
         const token = cookie.get("token");
@@ -48,9 +57,15 @@ function ProfilePage({
     };
 
     getPosts();
-  }, []);
+  }, [router.query.username]);
+  
+  useEffect(() => {
+    showToastr && setTimeout(() => setShowToastr(false), 3000);
+  }, [showToastr]);
+  
   return (
     <>
+    {showToastr && <PostDeleteToastr />}
     <Grid stackable>
       <Grid.Row>
         <Grid.Column>
@@ -62,6 +77,61 @@ function ProfilePage({
             ownAccount={ownAccount}
             loggedUserFollowStats={loggedUserFollowStats}
           />
+        </Grid.Column>
+      </Grid.Row>
+
+      <Grid.Row>
+        <Grid.Column>
+          {activeItem === "profile" && (
+            <>
+              <ProfileHeader 
+                profile={profile}
+                ownAccount={ownAccount}
+                loggedUserFollowStats={loggedUserFollowStats}
+                setUserFollowStats={setUserFollowStats}
+              />
+
+              {loading ? (
+                <PlaceHolderPosts />
+                ) : 
+                  posts.length > 0 ? (
+                  posts.map(post => (
+                    <CardPost 
+                      key={post._id}
+                      post={post}
+                      user={user}
+                      setPosts={setPosts}
+                      setShowToastr={setShowToastr}
+                    />
+                  ))
+                ) : (
+                  <NoProfilePosts />
+                )}
+            </>
+          )}
+
+          {activeItem === "followers" && (
+            <Followers 
+              user={user}
+              loggedUserFollowStats={loggedUserFollowStats}
+              setUserFollowStats={setUserFollowStats}
+              profileUserId={profile.user._id}
+            />
+          )}
+
+            {activeItem === "following" && (
+            <Following 
+              user={user}
+              loggedUserFollowStats={loggedUserFollowStats}
+              setUserFollowStats={setUserFollowStats}
+              profileUserId={profile.user._id}
+            />
+          )}
+
+          {activeItem === "updateProfile" && <UpdateProfile Profile={profile} />}
+          {activeItem === "settings" && (
+            <Settings newMessagePopup={user.newMessagePopup} />
+          )}
         </Grid.Column>
       </Grid.Row>
     </Grid>

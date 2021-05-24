@@ -1,5 +1,6 @@
 import React from 'react';
 import { Form, Segment, Image, Icon, Header } from "semantic-ui-react";
+import { useRouter } from "next/router";
 
 function ImageDropDiv({
   highlighted,
@@ -8,8 +9,12 @@ function ImageDropDiv({
   handleChange,
   mediaPreview,
   setMediaPreview,
-  setMedia
+  setMedia,
+  profilePicUrl
 }) {
+  const router = useRouter();
+
+  const signupRoute = router.pathname === "/signup";
   return (
     <>
       <Form.Field>
@@ -44,7 +49,7 @@ function ImageDropDiv({
               {mediaPreview === null ? (
                 <>
                   <Segment color={highlighted ? "green" : ""} placeholder basic>
-                    <Header icon>
+                    {signupRoute ? (<Header icon>
                       <Icon 
                         name="file image outline"
                         style={{ cursor: "pointer" }}
@@ -52,7 +57,17 @@ function ImageDropDiv({
                       />
                       Gooi jouw afbeelding in deze veld
                     </Header>
-
+                    ) : (
+                      <span style={{ textAlign: "center" }}>
+                        <Image 
+                          src={profilePicUrl} 
+                          style={{cursor: "pointer" }} onClick={() => inputRef.current.click()} 
+                          ize="huge"
+                          centered  
+                          />
+                      </span>
+                    )}
+                  
                   </Segment>
                 </>
               ) : (
