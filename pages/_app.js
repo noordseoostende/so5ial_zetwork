@@ -1,35 +1,34 @@
-import App from 'next/app';
+import App from "next/app";
 import axios from "axios";
 import { parseCookies, destroyCookie } from "nookies";
 import baseUrl from "../utils/baseUrl";
 import { redirectUser } from "../utils/authUser";
-import Layout from '../components/Layout/Layout';
-import 'react-toastify/dist/ReactToastify.css';
-import 'semantic-ui-css/semantic.min.css';
+import Layout from "../components/Layout/Layout";
+import "react-toastify/dist/ReactToastify.css";
+import "semantic-ui-css/semantic.min.css";
 
-class MyApp extends App{
-  static async getInitialProps({Component,ctx}) {
-    const {token} = parseCookies(ctx);
+class MyApp extends App {
+  static async getInitialProps({ Component, ctx }) {
+    const { token } = parseCookies(ctx);
     let pageProps = {};
 
-    const protectedRoutes = 
-      ctx.pathname === "/" || 
-      ctx.pathname === "/[username]" || 
-      ctx.pathname === "/post/[postId]";
+    const protectedRoutes = ctx.pathname === "/" || ctx.pathname === "/[username]";
 
-    if(!token) {
+    if (!token) {
       protectedRoutes && redirectUser(ctx, "/login");
     }
     //
     else {
-
       if (Component.getInitialProps) {
         pageProps = await Component.getInitialProps(ctx);
       }
 
       try {
-        const res = await axios.get(`${baseUrl}/api/auth`, {headers: {Authorization: token}});
-        const {user, userFollowStats} = res.data;
+        const res = await axios.get(`${baseUrl}/api/auth`, {
+          headers: { Authorization: token }
+        });
+
+        const { user, userFollowStats } = res.data;
 
         if (user) !protectedRoutes && redirectUser(ctx, "/");
 
@@ -40,19 +39,18 @@ class MyApp extends App{
         redirectUser(ctx, "/login");
       }
     }
+
     return { pageProps };
-
-    console.log(pageProps);
-    return {};
   }
-  render() {
 
-    const {Component, pageProps} = this.props;
-      return (
-        <Layout {...pageProps}>
-          <Component {...pageProps}  />
-        </Layout>
-      );
+  render() {
+    const { Component, pageProps } = this.props;
+
+    return (
+      <Layout {...pageProps}>
+        <Component {...pageProps} />
+      </Layout>
+    );
   }
 }
 

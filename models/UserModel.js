@@ -18,7 +18,7 @@ const UserSchema = new Schema({
   
   unreadNotification: {type: Boolean, default: false},
   
-  role: {type: String, default: "user", enum: ["user", "root"]},
+  role: {type: String, default: "user", enum: ["user", "root"] },
 
   resetToken: {type: String},
 

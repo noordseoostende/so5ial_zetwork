@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { Menu } from "semantic-ui-react";
 
 function ProfileMenuTabs({
@@ -12,50 +12,49 @@ function ProfileMenuTabs({
   return (
     <>
       <Menu pointing secondary>
-        <Menu.Item name="profile" active={activeItem === "profile"} onClick={() => handleItemClick('profile')} />
+        <Menu.Item
+          name="profile"
+          active={activeItem === "profile"}
+          onClick={() => handleItemClick("profile")}
+        />
 
-        { ownAccount ? (
+        <Menu.Item
+          name={`${followersLength} followers`}
+          active={activeItem === "followers"}
+          onClick={() => handleItemClick("followers")}
+        />
+
+        {ownAccount ? (
           <>
             <Menu.Item
               name={`${
-                loggedUserFollowStats.followers.length > 0 
-                ? loggedUserFollowStats.followers.length 
-                : 0
-              } Followers`} 
-                active={activeItem === "followers"}
-                onClick={() => handleItemClick("followers")}
-              />
+                loggedUserFollowStats.following.length > 0
+                  ? loggedUserFollowStats.following.length
+                  : 0
+              } following`}
+              active={activeItem === "following"}
+              onClick={() => handleItemClick("following")}
+            />
 
-              <Menu.Item
-              name={`${
-                loggedUserFollowStats.following.length > 0 
-                ? loggedUserFollowStats.following.length 
-                : 0
-              } Following`} 
-                active={activeItem === "following"}
-                onClick={() => handleItemClick("following")}
-              />
+            <Menu.Item
+              name="Update Profile"
+              active={activeItem === "updateProfile"}
+              onClick={() => handleItemClick("updateProfile")}
+            />
+
+            <Menu.Item
+              name="settings"
+              active={activeItem === "settings"}
+              onClick={() => handleItemClick("settings")}
+            />
           </>
         ) : (
-          <>
-            <Menu.Item
-              name={`${followersLength} Followers`} 
-                active={activeItem === "followers"}
-                onClick={() => handleItemClick("followers")}
-              />
-
-              <Menu.Item
-              name={`${followingLength} Following`} 
-                active={activeItem === "following"}
-                onClick={() => handleItemClick("following")}
-              />
-          </>
+          <Menu.Item
+            name={`${followingLength} following`}
+            active={activeItem === "following"}
+            onClick={() => handleItemClick("following")}
+          />
         )}
-              {ownAccount && <>
-                <Menu.Item name="Update Profile" active={activeItem === 'updateProfile'} onClick={() => handleItemClick("UpdateProfile")} />
-
-                <Menu.Item name="Settings" active={activeItem === 'settings'} onClick={() => handleItemClick("settings")} />
-              </>}
       </Menu>
     </>
   );

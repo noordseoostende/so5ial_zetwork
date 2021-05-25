@@ -6,11 +6,15 @@ const PostModel = require("../models/PostModel");
 const FollowerModel = require("../models/FollowerModel");
 const ProfileModel = require("../models/ProfileModel");
 const bcrypt = require("bcryptjs");
+const {
+  newFollowerNotification,
+  removeFollowerNotification
+} = require("../utilsServer/notificationActions");
 
 // GET PROFILE INFO
 router.get("/:username", authMiddleware, async (req, res) => {
-  const { username } = req.params;
   try {
+    const { username } = req.params;
 
     const user = await UserModel.findOne({ username: username.toLowerCase() });
     if (!user) {
@@ -58,145 +62,146 @@ router.get(`/posts/:username`, authMiddleware, async (req, res) => {
   }
 });
 
-// GET FOLLOWERS
+// GET FOLLOWERS OF USER
 router.get("/followers/:userId", authMiddleware, async (req, res) => {
-  const { userId } = req.params;
-
   try {
-    const user = await (await FollowerModel.findOne({user: userId})).populated('followers.user');
+    const { userId } = req.params;
+
+    const user = await FollowerModel.findOne({ user: userId }).populate("followers.user");
 
     return res.json(user.followers);
   } catch (error) {
     console.error(error);
-    return res.status(500).send(`Server error`);
+    return res.status(500).send("Server Error");
   }
 });
 
-// GET FOLLOWING
+// GET FOLLOWING OF USER
 router.get("/following/:userId", authMiddleware, async (req, res) => {
-  const { userId } = req.params;
-
   try {
-    const user = await (await FollowerModel.findOne({user: userId})).populated('following.user');
+    const { userId } = req.params;
+
+    const user = await FollowerModel.findOne({ user: userId }).populate("following.user");
 
     return res.json(user.following);
   } catch (error) {
     console.error(error);
-    return res.status(500).send(`Server error`);
+    return res.status(500).send("Server Error");
   }
 });
 
 // FOLLOW A USER
-
-router.post('/follow/:userToFollowId', authMiddleware, async(req,res) => {
-
-  const {userId} = req;
-  const {userToFollowId} = req.params;
-
+router.post("/follow/:userToFollowId", authMiddleware, async (req, res) => {
   try {
-    const user = await FollowerModel.findOne({user: userId });
-    const userToFollow = await FollowerModel.findOne({user: userToFollowId});
+    const { userId } = req;
+    const { userToFollowId } = req.params;
 
-    if (!user || userToFollow) {
-      return res.status(404).send('Gebruiker bestaat niet');
+    const user = await FollowerModel.findOne({ user: userId });
+    const userToFollow = await FollowerModel.findOne({ user: userToFollowId });
+
+    if (!user || !userToFollow) {
+      return res.status(404).send("User not found");
     }
 
-    const isFollowing = 
-      user.following.length > 0 && 
-      user.following.filter(
-        following => following.user.toString() === userToFollowId
-      ).length > 0;
+    const isFollowing =
+      user.following.length > 0 &&
+      user.following.filter(following => following.user.toString() === userToFollowId)
+        .length > 0;
 
     if (isFollowing) {
-      return res.status(401).send("Gebruiker al volgt");
+      return res.status(401).send("User Already Followed");
     }
 
-    await user.folowing.unshift({ user: userToFolowId });
+    await user.following.unshift({ user: userToFollowId });
     await user.save();
 
     await userToFollow.followers.unshift({ user: userId });
     await userToFollow.save();
 
-    return res.status(200).send("Success");
+    await newFollowerNotification(userId, userToFollowId);
+
+    return res.status(200).send("Updated");
   } catch (error) {
     console.error(error);
-    return res.status(500).send(`Server error`);
+    return res.status(500).send("Server Error");
   }
 });
 
 // UNFOLLOW A USER
-
-router.put('/unfollow/:userToUnfollowId', authMiddleware, async(req,res) => {
-
-  const {userId} = req;
-  const {userToUnfollowId} = req.params;
-
+router.put("/unfollow/:userToUnfollowId", authMiddleware, async (req, res) => {
   try {
-    const user = await FollowerModel.findOne({user: userId });
-    const userToFollow = await FollowerModel.findOne({user: userToFollowId});
-    
+    const { userId } = req;
+    const { userToUnfollowId } = req.params;
+
+    const user = await FollowerModel.findOne({
+      user: userId
+    });
+
+    const userToUnfollow = await FollowerModel.findOne({
+      user: userToUnfollowId
+    });
+
     if (!user || !userToUnfollow) {
-      return res.status(404).send("Gebruiker was niet gevonden");
+      return res.status(404).send("User not found");
     }
 
-    const isFollowing = 
-      user.following.length > 0 && 
-      user.following.filter(
-        following => following.user.toString() === userToUnfollowId
-      ).length === 0;
+    const isFollowing =
+      user.following.length > 0 &&
+      user.following.filter(following => following.user.toString() === userToUnfollowId)
+        .length === 0;
 
-      if (isFollowing) {
-        return res.status(401).send("Gebruiker was niet eerder gevolgd");
-      }
+    if (isFollowing) {
+      return res.status(401).send("User Not Followed before");
+    }
 
-      const removeFollowing = user.following
-        .map(following => following.user.toString())
-        .indexOf(userToUnfollowId);
+    const removeFollowing = await user.following
+      .map(following => following.user.toString())
+      .indexOf(userToUnfollowId);
 
-      await user.following.splice(removeFollowing, 1);
-      await user.save();
+    await user.following.splice(removeFollowing, 1);
+    await user.save();
 
-      const removeFollowers = userToUnfollow.followers.map(follower => follower.user.toString()).indexOf(userId);
+    const removeFollower = await userToUnfollow.followers
+      .map(follower => follower.user.toString())
+      .indexOf(userId);
 
-      await userToUnfollow.followers.splice(removeFollower, 1);
-      await userToUnfollow.save();
+    await userToUnfollow.followers.splice(removeFollower, 1);
+    await userToUnfollow.save();
 
-      return res.status(200).send("Success");
+    await removeFollowerNotification(userId, userToUnfollowId);
+
+    return res.status(200).send("Updated");
   } catch (error) {
     console.error(error);
-    return res.status(500).send(`Server error`);
+    res.status(500).send("server error");
   }
 });
 
 // UPDATE PROFILE
-
-router.post('/update', authMiddleware, async(req, res) => {
+router.post("/update", authMiddleware, async (req, res) => {
   try {
     const { userId } = req;
 
-    const {
-      bio,
-      facebook,
-      youtube,
-      twitter,
-      instagram,
-      profilePicUrl
-    } = req.body;
+    const { bio, facebook, youtube, twitter, instagram, profilePicUrl } = req.body;
 
     let profileFields = {};
-    profileFields.user = userId;
+    profileFields.user = user._id;
 
     profileFields.bio = bio;
 
     profileFields.social = {};
+
     if (facebook) profileFields.social.facebook = facebook;
+
     if (youtube) profileFields.social.youtube = youtube;
+
     if (instagram) profileFields.social.instagram = instagram;
+
     if (twitter) profileFields.social.twitter = twitter;
 
     await ProfileModel.findOneAndUpdate(
       { user: userId },
-      { $set: profileFields},
+      { $set: profileFields },
       { new: true }
     );
 
@@ -207,10 +212,9 @@ router.post('/update', authMiddleware, async(req, res) => {
     }
 
     return res.status(200).send("Success");
-
   } catch (error) {
     console.error(error);
-    return res.status(500).send(`Server error`);
+    return res.status(500).send("Server Error");
   }
 });
 
@@ -228,13 +232,13 @@ router.post("/settings/password", authMiddleware, async (req, res) => {
     const isPassword = await bcrypt.compare(currentPassword, user.password);
 
     if (!isPassword) {
-      return res.status(401).send("Ongeldige Wachtwoord");
+      return res.status(401).send("Invalid Password");
     }
 
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
 
-    return res.status(200).send("Updated successfully");
+    res.status(200).send("Updated successfully");
   } catch (error) {
     console.error(error);
     return res.status(500).send("Server Error");

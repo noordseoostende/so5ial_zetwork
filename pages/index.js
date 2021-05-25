@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import baseUrl from "../utils/baseUrl";
-import CreatePost from '../components/Post/CreatePost';
-import CardPost from '../components/Post/CardPost';
+import CreatePost from "../components/Post/CreatePost";
+import CardPost from "../components/Post/CardPost";
 import { Segment } from "semantic-ui-react";
 import { parseCookies } from "nookies";
 import { NoPosts } from "../components/Layout/NoData";
@@ -12,15 +12,14 @@ import { PlaceHolderPosts, EndMessage } from "../components/Layout/PlaceHolderGr
 import cookie from "js-cookie";
 
 function Index({ user, postsData, errorLoading }) {
-  const [posts, setPosts] = useState(postsData);
+  const [posts, setPosts] = useState(postsData||[]);
   const [showToastr, setShowToastr] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
   const [pageNumber, setPageNumber] = useState(2);
 
   useEffect(() => {
-    document.title = `Welcome, ${user.name.split(' ')[0]}`;
-  
+    document.title = `Welcome, ${user.name.split(" ")[0]}`;
   }, []);
 
   useEffect(() => {
@@ -42,24 +41,23 @@ function Index({ user, postsData, errorLoading }) {
       alert("Error fetching Posts");
     }
   };
-  
-  
+
+  if (posts.length === 0 || errorLoading) return <NoPosts />;
+
   return (
     <>
-    {showToastr && <PostDeleteToastr />}
+      {showToastr && <PostDeleteToastr />}
       <Segment>
         <CreatePost user={user} setPosts={setPosts} />
-          {posts.length === 0 || errorLoading ? <NoPosts /> : 
-            <InfiniteScroll
-            hasMore={hasMore}
-            next={fetchDataOnScroll}
-            loader={<PlaceHolderPosts />}
-            endMessage={<EndMessage />}
-            dataLength={posts.length}
-          >
 
+        <InfiniteScroll
+          hasMore={hasMore}
+          next={fetchDataOnScroll}
+          loader={<PlaceHolderPosts />}
+          endMessage={<EndMessage />}
+          dataLength={posts.length}>
           {posts.map(post => (
-            <CardPost 
+            <CardPost
               key={post._id}
               post={post}
               user={user}
@@ -67,9 +65,7 @@ function Index({ user, postsData, errorLoading }) {
               setShowToastr={setShowToastr}
             />
           ))}
-          </InfiniteScroll>
-          }
-          
+        </InfiniteScroll>
       </Segment>
     </>
   );
@@ -89,17 +85,5 @@ Index.getInitialProps = async ctx => {
     return { errorLoading: true };
   }
 };
-
-// Index.getInitialProps = async ctx => {
-//     const res = await axios.get('https://jsonplaceholder.typicode.com/posts');
-
-//     const {name } =ctx.query;
-//     console.log(name);
-
-//     return { posts: res.data };
-
-
-  
-// };
 
 export default Index;
