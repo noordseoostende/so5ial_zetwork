@@ -1,18 +1,18 @@
 import { Icon, Message, Divider } from "semantic-ui-react";
 import { useRouter } from "next/router";
-import Link from 'next/link';
+import Link from "next/link";
 
 export const HeaderMessage = () => {
-  const router = useRouter()
-  const signupRoute = router.pathname === "/signup"
+  const router = useRouter();
+  const signupRoute = router.pathname === "/signup";
 
   return (
-    <Message 
+    <Message
       color="teal"
       attached
-      header={signupRoute ? "Aan De Slag" : "Hallo, je ben terug gekomen"}
-      icon={signupRoute ? "setting" : "privacy"}
-      content={signupRoute ? "Creer nieuw account" : "Aanmelden met Email of Wachtwoord"}
+      header={signupRoute ? "Get Started" : "Welcome Back"}
+      icon={signupRoute ? "settings" : "privacy"}
+      content={signupRoute ? "Create New Account" : "Login with Email and Password"}
     />
   );
 };
@@ -27,10 +27,7 @@ export const FooterMessage = () => {
         <>
           <Message attached="bottom" warning>
             <Icon name="help" />
-            Bestaande gebruiker?{" "}
-            <Link href="/login">
-              Aanmeld zich hier dan
-            </Link>
+            Existing User? <Link href="/login">Login Here Instead</Link>
           </Message>
           <Divider hidden />
         </>
@@ -38,20 +35,15 @@ export const FooterMessage = () => {
         <>
           <Message attached="bottom" info>
             <Icon name="lock" />
-            <Link href="/reset">
-              Vergeet Wachtwoord?
-            </Link>
+            <Link href="/reset">Forgot Password?</Link>
           </Message>
 
           <Message attached="bottom" warning>
             <Icon name="help" />
-              Niuwe gebruiker?
-            <Link href="/signup">Inschrijven
-            </Link> In plaats van{" "}
+            New User? <Link href="/signup">Signup Here</Link> Instead{" "}
           </Message>
         </>
       )}
-      </>
+    </>
   );
-
 };

@@ -1,27 +1,35 @@
-import React from 'react';
+import React from "react";
 import { Form, Button, Message, TextArea, Divider } from "semantic-ui-react";
 
-function CommonInputs({user:{bio, facebook, instagram, youtube, twitter}, 
+function CommonInputs({
+  user: { bio, facebook, instagram, youtube, twitter },
   handleChange,
-  showSocialLinks, setShowSocialLinks
+  showSocialLinks,
+  setShowSocialLinks
 }) {
-  return (   
+  return (
     <>
-    <Form.Field 
-      required 
-      control={TextArea} 
-      name="bio" 
-      value={bio} 
-      onChange={handleChange}
-      placeholder="bio"
+      <Form.Field
+        required
+        control={TextArea}
+        name="bio"
+        value={bio}
+        onChange={handleChange}
+        placeholder="bio"
       />
 
-      <Button content="Add Social Links" color="red" icon="at" type="button" onClick={()=> setShowSocialLinks(!showSocialLinks)} />
+      <Button
+        content="Add Social Links"
+        color="red"
+        icon="at"
+        type="button"
+        onClick={() => setShowSocialLinks(!showSocialLinks)}
+      />
 
       {showSocialLinks && (
         <>
           <Divider />
-          <Form.Input 
+          <Form.Input
             icon="facebook f"
             iconPosition="left"
             name="facebook"
@@ -29,14 +37,15 @@ function CommonInputs({user:{bio, facebook, instagram, youtube, twitter},
             onChange={handleChange}
           />
 
-          <Form.Input 
+          <Form.Input
             icon="twitter"
             iconPosition="left"
             name="twitter"
             value={twitter}
             onChange={handleChange}
           />
-          <Form.Input 
+
+          <Form.Input
             icon="instagram"
             iconPosition="left"
             name="instagram"
@@ -44,7 +53,7 @@ function CommonInputs({user:{bio, facebook, instagram, youtube, twitter},
             onChange={handleChange}
           />
 
-          <Form.Input 
+          <Form.Input
             icon="youtube"
             iconPosition="left"
             name="youtube"
@@ -52,7 +61,7 @@ function CommonInputs({user:{bio, facebook, instagram, youtube, twitter},
             onChange={handleChange}
           />
 
-          <Message 
+          <Message
             icon="attention"
             info
             size="small"

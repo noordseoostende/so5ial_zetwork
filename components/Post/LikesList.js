@@ -4,7 +4,7 @@ import axios from "axios";
 import baseUrl from "../../utils/baseUrl";
 import catchErrors from "../../utils/catchErrors";
 import cookie from "js-cookie";
-// import Router from "next/router";
+import Router from "next/router";
 import { LikesPlaceHolder } from "../Layout/PlaceHolderGroup";
 
 function LikesList({ postId, trigger }) {
@@ -23,46 +23,46 @@ function LikesList({ postId, trigger }) {
     }
     setLoading(false);
   };
+
   return (
     <Popup
       on="click"
       onClose={() => setLikesList([])}
       onOpen={getLikesList}
       popperDependencies={[likesList]}
-      trugger={trigger}
-      wide
-    >
+      trigger={trigger}
+      wide>
       {loading ? (
         <LikesPlaceHolder />
       ) : (
         <>
           {likesList.length > 0 && (
-            <div 
-            style={{
-              overflow: "auto",
-              maxHeight: "15rem",
-              height: "15rem",
-              minWidth: "210px"
-            }}>
-                <List selection size="large">
-                  {likesList.map(like => (
-                    <List.Item key={like._id}>
-                      <Image avatar src={like.user.profilePicUrl} />
+            <div
+              style={{
+                overflow: "auto",
+                maxHeight: "15rem",
+                height: "15rem",
+                minWidth: "210px"
+              }}>
+              <List selection size="large">
+                {likesList.map(like => (
+                  <List.Item key={like._id}>
+                    <Image avatar src={like.user.profilePicUrl} />
 
-                      <List.Content>
-                        <Link href={`/${like.user.username}`}>
-                          <List.Header as="a" content={like.user.name} />
-                        </Link>
-                      </List.Content>
-                    </List.Item>
-                  ))}
-                </List>
-
+                    <List.Content>
+                      <List.Header
+                        onClick={() => Router.push(`/${like.user.username}`)}
+                        as="a"
+                        content={like.user.name}
+                      />
+                    </List.Content>
+                  </List.Item>
+                ))}
+              </List>
             </div>
           )}
         </>
       )}
-      
     </Popup>
   );
 }

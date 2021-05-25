@@ -12,13 +12,15 @@ class MyApp extends App {
     const { token } = parseCookies(ctx);
     let pageProps = {};
 
-    const protectedRoutes = ctx.pathname === "/" || 
-    ctx.pathname === "/[username]" ||
-    ctx.pathname === "/notifications" ||
-    ctx.pathname === "/post/[postId]"||
-    ctx.pathname === "/messages";
-
+    const protectedRoutes =
+      ctx.pathname === "/" ||
+      ctx.pathname === "/[username]" ||
+      ctx.pathname === "/notifications" ||
+      ctx.pathname === "/post/[postId]" ||
+      ctx.pathname === "/messages" ||
+      ctx.pathname === "/search";
     if (!token) {
+      destroyCookie(ctx, "token");
       protectedRoutes && redirectUser(ctx, "/login");
     }
     //

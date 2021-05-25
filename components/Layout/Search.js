@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { List, Image, Search } from "semantic-ui-react";
-import axios from 'axios';
-import cookie from 'js-cookie';
-import Router from 'next/router';
-import baseUrl from '../../utils/baseUrl';
+import axios from "axios";
+import cookie from "js-cookie";
+import Router from "next/router";
+import baseUrl from "../../utils/baseUrl";
 let cancel;
 
 function SearchComponent() {
-  const [text,setText]=useState('');
-  const [loading,setLoading]=useState(false);
-  const [results,setResults]=useState([]);
+  const [text, setText] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState([]);
 
   const handleChange = async e => {
-    const {value} = e.target;
+    const { value } = e.target;
     setText(value);
     setLoading(true);
 
@@ -29,20 +29,21 @@ function SearchComponent() {
       });
 
       if (res.data.length === 0) return setLoading(false);
-      setResults(res.data);
 
+      setResults(res.data);
     } catch (error) {
-      console.log('Error Searching');
+      alert("Error Searching");
     }
+
     setLoading(false);
   };
 
-
   return (
-    <Search 
-      onBlur={() => {results.length > 0 && setResults([]);
-      loading && setLoading(false);
-      setText("");
+    <Search
+      onBlur={() => {
+        results.length > 0 && setResults([]);
+        loading && setLoading(false);
+        setText("");
       }}
       loading={loading}
       value={text}
@@ -50,22 +51,20 @@ function SearchComponent() {
       results={results}
       onSearchChange={handleChange}
       minCharacters={1}
-      onResultSelect={(e, data) => Router.push(`/$(data.result.username)`)}
+      onResultSelect={(e, data) => Router.push(`/${data.result.username}`)}
     />
   );
 }
 
-const ResultRenderer = ({ _id, profilePicUrl,name}) => {
-
-
+const ResultRenderer = ({ _id, profilePicUrl, name }) => {
   return (
     <List key={_id}>
       <List.Item>
         <Image src={profilePicUrl} alt="ProfilePic" avatar />
         <List.Content header={name} as="a" />
       </List.Item>
-
-    </List>);
-}
+    </List>
+  );
+};
 
 export default SearchComponent;

@@ -1,9 +1,9 @@
-const express=require('express');
+const express = require("express");
 const router = express.Router();
-const authMiddleware = require('../middleware/authMiddleware');
-const UserModel = require('../models/UserModel');
-const PostModel = require('../models/PostModel');
-const FollowerModel =require('../models/FollowerModel');
+const authMiddleware = require("../middleware/authMiddleware");
+const UserModel = require("../models/UserModel");
+const PostModel = require("../models/PostModel");
+const FollowerModel = require("../models/FollowerModel");
 const uuid = require("uuid").v4;
 const {
   newLikeNotification,
@@ -12,15 +12,12 @@ const {
   removeCommentNotification
 } = require("../utilsServer/notificationActions");
 
-
-
 // CREATE A POST
 
 router.post("/", authMiddleware, async (req, res) => {
   const { text, location, picUrl } = req.body;
 
-  if (text.length < 1)
-    return res.status(401).send("Text must be atleast 1 character");
+  if (text.length < 1) return res.status(401).send("Text must be atleast 1 character");
 
   try {
     const newPost = {
@@ -42,7 +39,6 @@ router.post("/", authMiddleware, async (req, res) => {
 });
 
 // GET ALL POSTS
-
 
 router.get("/", authMiddleware, async (req, res) => {
   const { pageNumber } = req.query;
@@ -71,30 +67,32 @@ router.get("/", authMiddleware, async (req, res) => {
         .populate("comments.user");
     }
 
-    const {userId} = req;
-    const loggedUser = await FollowerModel.findOne({user: userId});
-
-    if(posts.length === 0) {
+    if (posts.length === 0) {
       return res.json([]);
     }
 
     let postsToBeSent = [];
+    const { userId } = req;
+
+    const loggedUser = await FollowerModel.findOne({ user: userId });
 
     if (loggedUser.following.length === 0) {
       postsToBeSent = posts.filter(post => post.user._id.toString() === userId);
-    } //
-
+    }
+    //
     else {
-      for(let i = 0; i < loggedUser.following.length; i++){
+      for (let i = 0; i < loggedUser.following.length; i++) {
         const foundPostsFromFollowing = posts.filter(
-          post => 
-          post.user._id.toString() === loggedUser.following[i].user.toString()
+          post => post.user._id.toString() === loggedUser.following[i].user.toString()
         );
-        if (foundPostsFromFollowing.length > 0) postsToBeSent.push(...foundPostsFromFollowing);
+
+        if (foundPostsFromFollowing.length > 0)
+          postsToBeSent.push(...foundPostsFromFollowing);
       }
       const foundOwnPosts = posts.filter(post => post.user._id.toString() === userId);
       if (foundOwnPosts.length > 0) postsToBeSent.push(...foundOwnPosts);
     }
+
     postsToBeSent.length > 0 &&
       postsToBeSent.sort((a, b) => [new Date(b.createdAt) - new Date(a.createdAt)]);
 
@@ -168,8 +166,7 @@ router.post("/like/:postId", authMiddleware, async (req, res) => {
       return res.status(404).send("No Post found");
     }
 
-    const isLiked =
-      post.likes.filter(like => like.user.toString() === userId).length > 0;
+    const isLiked = post.likes.filter(like => like.user.toString() === userId).length > 0;
 
     if (isLiked) {
       return res.status(401).send("Post already liked");
@@ -225,7 +222,6 @@ router.put("/unlike/:postId", authMiddleware, async (req, res) => {
   }
 });
 
-
 // GET ALL LIKES OF A POST
 
 router.get("/like/:postId", authMiddleware, async (req, res) => {
@@ -249,8 +245,8 @@ router.get("/like/:postId", authMiddleware, async (req, res) => {
 router.post("/comment/:postId", authMiddleware, async (req, res) => {
   try {
     const { postId } = req.params;
-    const { userId } = req;
 
+    const { userId } = req;
     const { text } = req.body;
 
     if (text.length < 1)
@@ -263,7 +259,7 @@ router.post("/comment/:postId", authMiddleware, async (req, res) => {
     const newComment = {
       _id: uuid(),
       text,
-      user: req.userId,
+      user: userId,
       date: Date.now()
     };
 
@@ -286,7 +282,6 @@ router.post("/comment/:postId", authMiddleware, async (req, res) => {
     return res.status(500).send(`Server error`);
   }
 });
-
 
 // DELETE A COMMENT
 

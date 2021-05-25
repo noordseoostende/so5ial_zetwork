@@ -156,15 +156,11 @@ const removeFollowerNotification = async (userId, userToNotifyId) => {
   }
 };
 
-
 module.exports = {
   newLikeNotification,
   removeLikeNotification,
   newCommentNotification,
   removeCommentNotification,
+  newFollowerNotification,
+  removeFollowerNotification
 };
-
-// newCommentNotification,
-//   removeCommentNotification,
-//   newFollowerNotification,
-//   removeFollowerNotification

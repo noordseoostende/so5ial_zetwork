@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { Modal, Grid, Image, Card, Icon, Divider } from "semantic-ui-react";
 import PostComments from "./PostComments";
 import CommentInputField from "./CommentInputField";

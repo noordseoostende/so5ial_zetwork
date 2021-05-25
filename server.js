@@ -1,13 +1,13 @@
 const express = require("express");
-const app = require('express')();
-const server = require('http').Server(app);
+const app = express();
+const server = require("http").Server(app);
 const io = require("socket.io")(server);
-const next = require('next');
-const dev = process.env.NODE_ENV !== 'production';
+const next = require("next");
+const dev = process.env.NODE_ENV !== "production";
 const nextApp = next({ dev });
 const handle = nextApp.getRequestHandler();
-require('dotenv').config({ path: "./config.env" });
-const connectDb = require('./utilsServer/connectDb');
+require("dotenv").config({ path: "./config.env" });
+const connectDb = require("./utilsServer/connectDb");
 connectDb();
 app.use(express.json());
 const PORT = process.env.PORT || 3000;
@@ -19,6 +19,8 @@ const {
   deleteMsg
 } = require("./utilsServer/messageActions");
 
+const { likeOrUnlikePost } = require("./utilsServer/likeOrUnlikePost");
+
 io.on("connection", socket => {
   socket.on("join", async ({ userId }) => {
     const users = await addUser(userId, socket.id);
@@ -29,6 +31,41 @@ io.on("connection", socket => {
         users: users.filter(user => user.userId !== userId)
       });
     }, 10000);
+  });
+
+  socket.on("likePost", async ({ postId, userId, like }) => {
+    const {
+      success,
+      name,
+      profilePicUrl,
+      username,
+      postByUserId,
+      error
+    } = await likeOrUnlikePost(postId, userId, like);
+
+    if (success) {
+      socket.emit("postLiked");
+
+      if (postByUserId !== userId) {
+        const receiverSocket = findConnectedUser(postByUserId);
+
+        if (receiverSocket && like) {
+          // WHEN YOU WANT TO SEND DATA TO ONE PARTICULAR CLIENT
+          io.to(receiverSocket.socketId).emit("newNotificationReceived", {
+            name,
+            profilePicUrl,
+            username,
+            postId
+          });
+        }
+      }
+    }
+  });
+
+  socket.on("loadMessages", async ({ userId, messagesWith }) => {
+    const { chat, error } = await loadMessages(userId, messagesWith);
+
+    !error ? socket.emit("messagesLoaded", { chat }) : socket.emit("noChatFound");
   });
 
   socket.on("sendNewMsg", async ({ userId, msgSendToUserId, msg }) => {
@@ -81,7 +118,7 @@ nextApp.prepare().then(() => {
   app.use("/api/notifications", require("./api/notifications"));
   app.use("/api/chats", require("./api/chats"));
   app.use("/api/reset", require("./api/reset"));
-    
+
   app.all("*", (req, res) => handle(req, res));
 
   server.listen(PORT, err => {
@@ -89,10 +126,3 @@ nextApp.prepare().then(() => {
     console.log("Express server running");
   });
 });
-
-// mongodb+srv://romeo:raffael@olmec.8c71i.mongodb.net/Medison?retryWrites=true&w=majority
-// jwtSecret=Adam
-
-// mongodb+srv://Leo:leo123456@triade.dxhqz.mongodb.net/chaat?retryWrites=true&w=majority
-
-// app.use('/api/auth', require('./api/auth'))

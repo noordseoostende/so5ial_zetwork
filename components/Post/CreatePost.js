@@ -56,10 +56,12 @@ function CreatePost({ user, setPosts }) {
       setNewPost,
       setError
     );
+
     setMedia(null);
     setMediaPreview(null);
     setLoading(false);
   };
+
   return (
     <>
       <Form error={error !== null} onSubmit={handleSubmit}>
@@ -67,13 +69,13 @@ function CreatePost({ user, setPosts }) {
           error
           onDismiss={() => setError(null)}
           content={error}
-          header="Shweps!"
+          header="Oops!"
         />
 
         <Form.Group>
-        <Image src={user.profilePicUrl} circular avatar inline />
-        <Form.TextArea
-            placeholder="Wat Gebeurt"
+          <Image src={user.profilePicUrl} circular avatar inline />
+          <Form.TextArea
+            placeholder="Whats Happening"
             name="text"
             value={newPost.text}
             onChange={handleChange}
@@ -89,7 +91,7 @@ function CreatePost({ user, setPosts }) {
             onChange={handleChange}
             label="Add Location"
             icon="map marker alternate"
-            placeholder="Nodig de Locatie toevoegen?"
+            placeholder="Want to add Location?"
           />
 
           <input
@@ -102,31 +104,28 @@ function CreatePost({ user, setPosts }) {
           />
         </Form.Group>
 
-        <div 
+        <div
           onClick={() => inputRef.current.click()}
           style={addStyles()}
-
-          onDrag={(e) => {
+          onDrag={e => {
             e.preventDefault();
             setHighlighted(true);
           }}
-
-          onDragLeave={(e) => {
+          onDragLeave={e => {
             e.preventDefault();
             setHighlighted(false);
           }}
           onDrop={e => {
             e.preventDefault();
             setHighlighted(true);
-            
 
             const droppedFile = Array.from(e.dataTransfer.files);
+
             setMedia(droppedFile[0]);
             setMediaPreview(URL.createObjectURL(droppedFile[0]));
-          }}
-          >
-            {media === null ? (
-            <Icon name="plus"  size="big" />
+          }}>
+          {media === null ? (
+            <Icon name="plus" size="big" />
           ) : (
             <>
               <Image
@@ -138,21 +137,19 @@ function CreatePost({ user, setPosts }) {
               />
             </>
           )}
-
         </div>
         <Divider hidden />
 
-        <Button 
+        <Button
           circular
           disabled={newPost.text === "" || loading}
           content={<strong>Post</strong>}
           style={{ backgroundColor: "#1DA1F2", color: "white" }}
           icon="send"
           loading={loading}
-
         />
-        </Form>
-        <Divider />
+      </Form>
+      <Divider />
     </>
   );
 }

@@ -34,8 +34,8 @@ function Login() {
   };
 
   useEffect(() => {
-    document.title='Welcome terug'
-    const userEmail=cookie.get('userEmail');
+    document.title = "Welcome Back";
+    const userEmail = cookie.get("userEmail");
     if (userEmail) setUser(prev => ({ ...prev, email: userEmail }));
   }, []);
 
