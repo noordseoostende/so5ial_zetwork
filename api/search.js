@@ -6,6 +6,7 @@ const UserModel=require('../models/UserModel');
 router.get('/:searchText', authMiddleware, async(req, res) => {
   try {
   const {searchText} = req.params;
+  const { userId } = req;
 
   if(searchText.length === 0) return;
 
@@ -14,6 +15,9 @@ router.get('/:searchText', authMiddleware, async(req, res) => {
     const results = await UserModel.find({
       name: { $regex: userPattern, $options: "i" }
     });
+
+    const resultsToBeSent =
+      results.length > 0 && results.filter(result => result._id.toString() !== userId);
 
     res.json(results);
   } catch (error) {
