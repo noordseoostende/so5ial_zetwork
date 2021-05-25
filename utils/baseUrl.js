@@ -1,3 +1,4 @@
 const baseUrl ="http://localhost:3000";
 
-export default baseUrl;
+// export default baseUrl;
+module.exports = baseUrl;
